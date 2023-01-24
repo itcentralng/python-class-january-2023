@@ -1,6 +1,6 @@
 # Create a folder on the root of this folder with your name
 # Create a file called assignment.py within the created folder
-# And answer the following questions, submission on Monday 23rd of January, 2023
+# And answer the following questions, submission on Monday 25th of January, 2023
 
 # Q1: Using comments, list all the data types you know with examples
 # Q2: Read about variable naming convention in python and create examples of each
