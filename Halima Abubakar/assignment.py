@@ -1,5 +1,5 @@
 """
-Question1: List all the data types you know with examples 
+Question1:List all the data types you know with examples 
 
 String :- Any type of text within a "" or ''. Examples are; '100','Fatima',"13.44","18ift" and so on.
 
