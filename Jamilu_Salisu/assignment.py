@@ -8,7 +8,7 @@ name = "Jamilu Salisu"
 age = 24
 
 # Float
-height = 1.75
+sallary = 99.99
 
 # Boolean
 isHealthy = True
@@ -43,3 +43,22 @@ full_name1 = "Jamilu Salisu"
 height = 1.50
 Height = 1.60
 HEIGHT = 1.75
+
+
+# Q3: List 5 String methods with an example using print() in each case to print your result
+
+# split the string into a list
+print(name.split())
+
+# convert the string to uppercase
+print(firstname.upper())
+
+# replace a word in the string
+print(name.replace("Jamilu", "Mohammed"))
+
+# format the string
+print("I am {} years old and I earn {}$ per month.".format(
+    age, sallary))
+
+# count the number of times a word appears in the list
+print("I am learning Flutter and Python.".count("am"))
