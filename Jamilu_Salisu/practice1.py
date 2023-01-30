@@ -16,7 +16,7 @@ users = {"full_name": full_name, "email": email, "password": password}
 login_email = input("Enter your email: ")
 login_password = input("Enter your password: ")
 
-if login_email == users["email"] and login_password == users["password"]:
-    print("Login successful")
+if login_email == users.get(email) and login_password == users.get(password):
+    print("Welcome {}".format(users.get(full_name)))
 else:
     print("Login failed")
