@@ -3,15 +3,15 @@
 # Answer the follwoing questions:
 
 # Q1: 
-# Declare a variable called "str" and assign it a string
-#  value. Use the toLowerCase() method to convert "str"
+# Declare a variable called "string" and assign it a string
+#  value. Use the lower() method to convert "string"
 #  to lowercase, then use the split() method to create
-#  a list of characters from "str" and use the reverse()
+#  a list of characters from "string" and use the reverse()
 #  method to reverse the order of the characters in 
 # the list. Finally, join the characters in the list 
 # back together into a string and store the result in 
-# a new variable called "reverseStr". Compare "str" 
-# to "reverseStr" using conditional statement and output 
+# a new variable called "reverse_string". Compare "string" 
+# to "reverse_string" using conditional statement and output 
 # "The string is a palindrome" if they are the same or 
 # "The string is not a palindrome" if they are different.
 
