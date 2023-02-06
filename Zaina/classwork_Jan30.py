@@ -17,7 +17,7 @@ password2 = input('enter your password ')
 
 if email == email2:
     if password == password2:
-        if len(password) <= 6 :
+        if len(password) < 6 :
             print('Welcome to our website ', name)
         else:
             print('password is too long')
