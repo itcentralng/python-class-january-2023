@@ -84,3 +84,5 @@ numbers = [0, 12, 3]
 # password is correct notify them that their 
 # email is wrong. If neither are correct
 # tell them their credentials are invalid
+
+# QUICK RECAP

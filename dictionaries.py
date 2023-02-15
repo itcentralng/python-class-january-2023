@@ -71,3 +71,6 @@ print(person5.get("name"))
 person5.pop("age")
 
 print(person5)
+
+# QUICK RECAP
+{"name":"Shamsu"}
