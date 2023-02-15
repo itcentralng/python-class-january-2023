@@ -94,7 +94,7 @@ NOTE: There should be atleast 3 students and atleast 5 subjects each student.
 Students_record = {'Name': ['Aminu','Fatima','Abdul'], 'Age': [16,14,15],'Class': ['Jss2','Jss1','Jss2'],
                    'Subjects': [{'English':[{'C.A':[24,15,20],'Exam':[65,40,53],'Total':[89,55,73]}],'Maths':[{'C.A':[24,15,20],'Exam':[65,40,53],'Total':[89,55,73]}],'Biology':[{'C.A':[24,15,20],'Exam':[65,40,53],'Total':[89,55,73]}],'chemistry':[{'C.A':[24,15,20],'Exam':[65,40,53],'Total':[89,55,73]}],'physics':[{'C.A':[24,15,20],'Exam':[65,40,53],'Total':[89,55,73]}]}]}
 print (Students_record())
-
+ 
 
 
 
