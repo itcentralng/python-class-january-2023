@@ -10,3 +10,6 @@ print(name.endswith("j"))
 
 # Format
 print("Hi, my name is {}".format(name))
+
+# QUICK RECAP
+name = "Zainab"

@@ -46,3 +46,6 @@ print(alist)
 
 alist.remove("Coke")
 print(alist)
+
+# QUICK RECAP
+people = ["Halima", "Shamsu"]
