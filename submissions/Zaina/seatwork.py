@@ -20,6 +20,38 @@ Nigeria = [
     {"sate":"Bauchi", "capital":"Bauchi"},
     {"sate":"Bayelsa", "capital":"Yenagoa"},
 ]
+state = []
+    state = random.choice(states)
+        if state not in states:
+            states.append(state)
+        response = input("What is the capital of {}? ".format(state.get('name')))
+        if response == 'end':
+    else:
+        if state.get('capital') == response:
+            print("That's correct.")
+        else:
+            print("Wrong, the capital of {} is {}".format(state.get('name')))
+
+    used_states = []
+    while playing:
+        state = random.choice(states)
+        if state not in used_states:
+            used_states.append(state)
+        response = input("What is the capital of {}? ".format(state.get('name'), state.get('capital')))
+    if len(state) == len(states):
+        playing = False
+
+
+        # if response == 'quit':
+        #     playing = False
+        # else:
+        #     if state.get('capital') == response:
+        #         print("That's correct!")
+        #     else:
+        #         print("Oops! wrong, the capital of {} is {}".format(state.get('name'), state.get('capital')))
+        # if len(used_states) == len(states):
+        #     playing = False 
+
 
 # for state in Nigeria:
 #     # state = random.choice(Nigeria)

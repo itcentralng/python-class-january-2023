@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 class Person:
     def __init__(self, name, age):
         self.name = name
@@ -27,21 +25,12 @@ print(teacher1.bio())
 print(teacher1.classInfo())
 
 
->>>>>>> d22448d7b8b5873617bdad2bfdcf17ca0e416a33
-class Animal:
-    def __init__(self, name, type):
-        self.name = name
-        self.type = type
-<<<<<<< HEAD
-    class Dog:
-        def set_breed(self, breed)
-=======
     
 class Dogs(Animal):
     def set_breed(self, breed):
         self.breed = breed
 # ASSIGMENT
 """
-Convert the state and capital game into a class blueprint for those kind of games. Make it work well with a dictionary or state and capital game.
+Convert the state and capital game into a class blueprint for those kind of games. Make it work well with 
+a dictionary or state and capital game.
 """
->>>>>>> d22448d7b8b5873617bdad2bfdcf17ca0e416a33
