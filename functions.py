@@ -138,3 +138,20 @@ or the user chooses to 'quit'
 The whole game should start when a function 
 is called. For example stateAndCapital() ==> game starts
 """
+
+# More functions
+
+def sumup(num1, num2):
+    num3 = num1+num2
+    print(num3)
+
+def prints5():
+    print(5)
+
+def printNum(num=6):
+    print(num)
+
+def myname(name):
+    print("I am ", name)
+
+# QUICK RECAP

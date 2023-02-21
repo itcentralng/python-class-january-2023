@@ -42,3 +42,16 @@ not
 in
 not in
 """
+
+# QUICK RECAP
+# Assignment operators
+# =, +=, -=, *=, /=, %=, **=, //=
+
+# Arithmetic Operators
+# +. -, *, /, **, %
+
+# Membership Operators
+# in, not in
+
+# Logical Operators
+# and, or, not

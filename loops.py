@@ -141,3 +141,5 @@ if spend_limit >= int(player_spend_limit):
                 player_spend_limit = input("Alright {}, how much do you want to spend now?".format(name))
 else:
     print("Sorry you have to spend 5000 or less")
+
+# QUICK RECAP
