@@ -1,72 +1,55 @@
-from flask import Flask, request
+from flask import Flask, request, session
+from flask_sqlalchemy import SQLAlchemy
+
+# create the extension
+db = SQLAlchemy()
 
 app = Flask(__name__)
 
-@app.get('/')
-def homepage():
-    return " Welcome to the homepage! "
+# configure the SQLite database, relative to the app instance folder
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///app.db"
 
-@app.post('/login')
-def login():
-    userdata = request.json
-    print(userdata)
-    return " Hi {user} , your login request was successful! ".format(user=userdata.get('username').split()[-1])
+# initialize the app with the extension
+db.init_app(app)
 
-@app.get('/leaderboard')
-def leaderboard():
-    students = [
-        {'name': 'Halima', 'score': 90},
-        {'name': 'Abubakar', 'score': 80},
-        {'name': 'Abdulwahab', 'score': 70},
-        {'name': 'Aisha', 'score': 60},
-    ]
-    return {'students': students}
+import os
 
-@app.patch('/student/<int:student_index>')
-def update_student(student_index):
-    student = request.json
-    students = [
-        {'name': 'Halima', 'score': 90},
-        {'name': 'Abubakar', 'score': 80},
-        {'name': 'Abdulwahab', 'score': 70},
-        {'name': 'Aisha', 'score': 60},
-    ]
-    students[student_index]['score'] = student['score']
-    print(student)
-    return {'students': students}
+app.secret_key = os.environ.get('SECRET_KEY')
 
-@app.delete('/student/<int:student_index>')
-def delete_student(student_index):
-    students = [
-        {'name': 'Halima', 'score': 90},
-        {'name': 'Abubakar', 'score': 80},
-        {'name': 'Abdulwahab', 'score': 70},
-        {'name': 'Aisha', 'score': 60},
-    ]
-    students.pop(student_index)
-    return {'students': students}
 
-@app.get('/student/<int:student_index>')
-def get_student(student_index):
-    students = [
-        {'name': 'Halima', 'score': 90},
-        {'name': 'Abubakar', 'score': 80},
-        {'name': 'Abdulwahab', 'score': 70},
-        {'name': 'Aisha', 'score': 60},
-    ]
-    return {'student': students[student_index]}
+class Student(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False)
+    email = db.Column(db.String, unique=True)
+    school = db.Column(db.String, nullable=False)
 
-@app.post('/student')
+with app.app_context():
+    db.create_all()
+
+
+@app.post('/add-student')
 def add_student():
-    userdata = request.json
-    students = [
-        {'name': 'Halima', 'score': 90},
-        {'name': 'Abubakar', 'score': 80},
-        {'name': 'Abdulwahab', 'score': 70},
-        {'name': 'Aisha', 'score': 60},
-    ]
-    students.append(userdata.get('student'))
-    return {'student': students}
+    name = request.json.get('name')
+    email = request.json.get('email')
+    school = request.json.get('school')
+    new_student = Student(name=name, email=email, school=school)
+    db.session.add(new_student)
+    db.session.commit()
+    return "Student Added Successful!"
+
+@app.get('/students')
+def get_students():
+    students = Student.query.all()
+    students = [{'id':student.id, 'name': student.name, 'email': student.email, 'school': student.school} for student in students]
+    return {'students': students}
+
+@app.get('/student/<int:id>')
+def get_student(id):
+    student = Student.query.filter_by(id=id).first()
+    if student:
+        student = {'id':student.id, 'name': student.name, 'email': student.email, 'school': student.school}
+        return {'student': student}
+    return {'message': 'Student not found'}, 404
 
 if __name__ == '__main__':
     app.run(debug=True)
