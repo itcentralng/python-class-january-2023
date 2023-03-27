@@ -3,10 +3,19 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_jwt import JWT, jwt_required, current_identity
 from werkzeug.security import generate_password_hash as gph, check_password_hash as cph
 
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+
 # create the extension
 db = SQLAlchemy()
 
 app = Flask(__name__)
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["10 per day", "5 per hour"],
+    storage_uri="memory://",
+)
 
 # configure the SQLite database, relative to the app instance folder
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///app.db"
@@ -75,6 +84,21 @@ def add_student():
     db.session.commit()
     return "Student Added Successful!"
 
+@app.put('/student/<int:id>')
+@jwt_required()
+def update_student(id):
+    name = request.json.get('name')
+    email = request.json.get('email')
+    school = request.json.get('school')
+
+    student = Student.query.filter_by(id=id).first()
+    student.name = name or student.name
+    student.email = email or student.email
+    student.school = school or student.school
+
+    db.session.commit()
+    return "Student updated successfully"
+
 @app.get('/students')
 @jwt_required()
 def get_students():
@@ -103,7 +127,7 @@ def add_teacher():
     return "Teacher Added Successful!"
 
 @app.get('/teachers')
-@jwt_required()
+# @jwt_required()
 def get_teachers():
     teachers = Teacher.query.filter_by(school='iT Central').all()
     teachers = [{'id':teacher.id, 'name': teacher.name, 'email': teacher.email, 'school': teacher.school} for teacher in teachers]
