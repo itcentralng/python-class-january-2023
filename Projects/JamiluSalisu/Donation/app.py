@@ -255,3 +255,7 @@ def delete_record(id):
     db.session.delete(record)
     db.session.commit()
     return {"message": "Record deleted successfully"}, 200
+
+
+if __name__ == "__main__":
+    app.run()
