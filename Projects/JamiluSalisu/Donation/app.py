@@ -54,10 +54,11 @@ class Patient(db.Model):
 class PatientRecord(db.Model):
     __tablename__ = 'patient_records'
     id = db.Column(db.Integer, primary_key=True)
-    patient_id = db.Column(db.Integer, db.ForeignKey(
+    patient_id = db.Column(db.String, db.ForeignKey(
         'patients.id'), nullable=False)
     hospital_id = db.Column(db.Integer, db.ForeignKey(
         'hospitals.id'), nullable=False)
+    hospital = db.relationship("Hospital")
     sickness = db.Column(db.String, nullable=False)
     amount = db.Column(db.Integer, nullable=False)
     created_at = db.Column(db.DateTime, nullable=False)
@@ -94,6 +95,9 @@ class PatientSchema(ma.SQLAlchemyAutoSchema):
 class PatientRecordSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = PatientRecord
+        include_relationships = True
+        include_fk = True
+    hospital = ma.Nested(HospitalSchema)
 
 
 class DonateSchema(ma.SQLAlchemyAutoSchema):

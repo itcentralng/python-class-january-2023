@@ -28,18 +28,14 @@ class User(db.Model):
 class USDWallet(db.Model):
     __tablename__ = 'usd_wallet'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey(
-        'users.id'), nullable=False, unique=True)
-    dollar_balance = db.Column(db.Integer, nullable=False)
+    dollar_balance = db.Column(db.Float(precision=2), nullable=False)
     date = db.Column(db.DateTime, nullable=False, default=timestamp)
 
 
 class NairaWallet(db.Model):
     __tablename__ = 'naira_wallet'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey(
-        'users.id'), nullable=False, unique=True)
-    naira_balance = db.Column(db.Integer, nullable=False)
+    naira_balance = db.Column(db.Float(precision=2), nullable=False)
     date = db.Column(db.DateTime, nullable=False, default=timestamp)
 
 
@@ -61,7 +57,7 @@ class NairaWalletSchema(ma.SQLAlchemyAutoSchema):
 with app.app_context():
     db.create_all()
 
-rate = 450
+exchange_rate = float(450)
 
 
 @app.route("/")
@@ -87,40 +83,114 @@ def register():
     return {"message": "User created successfully"}
 
 
-@app.post("/swap")
+@app.get("/users")
+def get_users():
+    users = User.query.all()
+    users = UserSchema().dump(users, many=True)
+    return {"users": users}
+
+
+@app.post('/desposit/usd')
+def deposit_usd():
+    amount = request.json['amount']
+    try:
+        amount = float(amount)
+        new_deposit = USDWallet(dollar_balance=amount)
+        db.session.add(new_deposit)
+        db.session.commit()
+        return {"message": "Deposit successful"}, 200
+    except ValueError:
+        return {"message": "Please enter a valid amount"}, 400
+
+
+@app.post('/desposit/ngn')
+def deposit_ngn():
+    amount = request.json['amount']
+    try:
+        amount = float(amount)
+        new_deposit = NairaWallet(naira_balance=amount)
+        db.session.add(new_deposit)
+        db.session.commit()
+        return {"message": "Deposit successful"}, 200
+    except ValueError:
+        return {"message": "Please enter a valid amount"}, 400
+
+
+@app.get("/balance/usd/<id>")
+def get_usd_balance(id):
+    usd_balance = USDWallet.query.filter_by(id=id).first()
+    if usd_balance:
+        usd_balance = USDWalletSchema().dump(usd_balance)
+        return {"usd_balance": usd_balance}, 200
+    else:
+        return {"message": "USD record does not exist"}, 400
+
+
+@ app.get("/balance/ngn/<id>")
+def get_ngn_balance(id):
+    ngn_balance = NairaWallet.query.filter_by(id=id).first()
+    if ngn_balance:
+        ngn_balance = NairaWalletSchema().dump(ngn_balance)
+        return {"ngn_balance": ngn_balance}, 200
+    else:
+        return {"message": "NGN record does not exist"}, 400
+
+
+@app.get('/history/usd')
+def get_usd_history():
+    usd_history = USDWallet.query.all()
+    usd_history = USDWalletSchema().dump(usd_history, many=True)
+    return {"usd_history": usd_history}
+
+
+@app.get('/history/ngn')
+def get_ngn_history():
+    ngn_history = NairaWallet.query.all()
+    ngn_history = NairaWalletSchema().dump(ngn_history, many=True)
+    return {"ngn_history": ngn_history}
+
+
+@app.patch("/swap")
 def swap():
-    user_id = request.json['user_id']
+    naira_wallet_id = request.json['naira_wallet_id']
+    usd_wallet_id = request.json['usd_wallet_id']
     to_currency = request.json['to_currency']
     amount = request.json['amount']
+    try:
+        amount = float(amount)
+        naira_wallet = NairaWallet.query.filter_by(id=naira_wallet_id).first()
+        usd_wallet = USDWallet.query.filter_by(id=usd_wallet_id).first()
 
-    if user_id and to_currency and amount:
-        swap(user_id, to_currency, amount)
-    else:
-        return {"message": "Please provide user_id, to_currency, amount"}, 400
+        if not naira_wallet:
+            return {"message": "NGN wallet could not be found"}, 400
 
+        if not usd_wallet:
+            return {"message": "USD wallet could not be found"}, 400
 
-def swap(user_id, to_currency, amount):
-    usd_wallet = USDWallet.query.filter_by(user_id=user_id).first()
-    naira_wallet = NairaWallet.query.filter_by(user_id=user_id).first()
+        if to_currency == "USD":
+            # check if naira wallet has enough funds
+            if naira_wallet.naira_balance < amount:
+                return {"message": "Insufficient NGN funds"}, 400
 
-    if to_currency == "NGN":
-        if usd_wallet.dollar_balance < amount:
-            return {"message": "Insufficient USD funds"}, 400
+            # deduct exact naira amount and topup to usd wallet
+            naira_wallet.naira_balance -= amount
+            usd_wallet.dollar_balance += (amount / exchange_rate)
+            db.session.commit()
+            return {"message": "Swap of NGN{} to USD is successful".format(amount)}
 
-        usd_wallet.dollar_balance -= amount  # deduct exact dollar amount
-        # convert dollar amount to naira and topup to wallet
-        naira_wallet.naira_balance += (amount * rate)
-        db.session.commit()
-        return {"message": "Swap of {} USD to NGN successful".format(amount)}
+        elif to_currency == "NGN":
+            # check if usd wallet has enough funds
+            if usd_wallet.dollar_balance < amount:
+                return {"message": "Insufficient USD funds"}, 400
 
-    elif to_currency == "USD":
-        if naira_wallet.naira_balance < amount:
-            return {"message": "Insufficient NGN funds"}, 400
+            # deduct exact dollar amount and topup to naira wallet
+            usd_wallet.dollar_balance -= amount
+            naira_wallet.naira_balance += (amount * exchange_rate)
+            db.session.commit()
+            return {"message": "Swap of USD{} to NGN is successful".format(amount)}
 
-        naira_wallet.naira_balance -= amount  # deduct exact naira amount
-        # convert naira amount to dollar and topup to wallet
-        usd_wallet.dollar_balance += (amount / rate)
-        db.session.commit()
-        return {"message": "Swap of {} NGN to USD successful".format(amount)}
-    else:
-        return {"message": "Invalid currency, please use USD or NGN"}, 400
+        else:
+            return {"message": "Invalid currency"}, 400
+
+    except ValueError:
+        return {"message": "Please enter a valid amount"}, 400
