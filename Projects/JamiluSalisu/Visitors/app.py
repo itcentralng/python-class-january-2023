@@ -32,6 +32,7 @@ class Staff(db.Model):
     role = db.Column(db.String, nullable=False)
     phone = db.Column(db.String, nullable=False, unique=True)
     email = db.Column(db.String, nullable=False, unique=True)
+    avaibility = db.Column(db.Boolean, nullable=False, default=True)
     created_at = db.Column(db.DateTime, nullable=False, default=timestamp)
     updated_at = db.Column(db.DateTime, nullable=True)
 
@@ -82,6 +83,15 @@ class VisitingLogSchema(ma.SQLAlchemyAutoSchema):
         include_relationships = True
         include_fk = True
     admin = ma.Nested(AdminSchema)
+    staff = ma.Nested(StaffSchema)
+    visitor = ma.Nested(VisitorSchema)
+
+
+class ActiveVisitorsSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = VisitingLog
+        include_relationships = True
+        include_fk = True
     staff = ma.Nested(StaffSchema)
     visitor = ma.Nested(VisitorSchema)
 
@@ -176,6 +186,9 @@ def log_visit():
     if not staff:
         return {"message": "Staff profile not found"}, 404
 
+    if staff.avaibility is False:
+        return {"message": "Staff not available"}, 404
+
     if not visitor:
         return {"message": "Visitor profile not found"}, 404
 
@@ -194,6 +207,18 @@ def logout_visit():
         return {"message": "Visitor logged out successfully"}, 200
 
     return {"message": "Invalid log id"}, 404
+
+
+@app.patch("/staff/availability")
+def staff_availability():
+    staff_id = request.json['staff_id']
+    staff = Staff.query.filter_by(id=staff_id).first()
+    if staff:
+        staff.avaibility = not staff.avaibility
+        db.session.commit()
+        return {"message": "Staff availability updated successfully"}, 200
+
+    return {"message": "Invalid staff id"}, 404
 
 
 @app.get("/list/admin")
@@ -221,6 +246,13 @@ def get_visitors():
 def get_visitors_log():
     visiting_log = VisitingLog.query.all()
     visiting_log_list = VisitingLogSchema().dump(visiting_log, many=True)
+    return {"visiting_log": visiting_log_list}
+
+
+@app.get("/list/active_logs")
+def get_active_visitors_log():
+    visiting_log = VisitingLog.query.filter_by(left_at=None).all()
+    visiting_log_list = ActiveVisitorsSchema().dump(visiting_log, many=True)
     return {"visiting_log": visiting_log_list}
 
 
